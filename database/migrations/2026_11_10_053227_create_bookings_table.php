@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Attendee
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->integer('tickets_booked');
             $table->decimal('total_amount', 10, 2);
