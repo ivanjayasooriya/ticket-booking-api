@@ -19,9 +19,10 @@ class Event extends Model
     ];
 
     protected $casts = [
+        'user_id' => 'integer',
         'date' => 'datetime',
         'total_tickets' => 'integer',
-        'ticket_price' => 'decimal:2',
+        'ticket_price' => 'float',
     ];
 
     public function organizer(): BelongsTo
