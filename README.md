@@ -1,58 +1,126 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ticket Booking API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel REST API for creating and managing events and booking tickets. The project supports event organizers creating listings and customers purchasing seats while enforcing real-time ticket availability checks.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Browse all events and fetch individual event details
+- Create, update, and delete events for authenticated organizers
+- Reserve tickets while checking stock availability and locking the event row during booking
+- Track customer bookings and total amounts
+- API authentication via Laravel Passport
+- SQLite-ready local development configuration
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.3+
+- Laravel 13
+- Laravel Passport
+- SQLite (default local setup)
+- Eloquent ORM
 
-## Learning Laravel
+## Project Structure
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- `app/Http/Controllers/Api/EventController.php` ? API endpoints for events and bookings
+- `app/Services/EventService.php` ? business logic for ticket booking and event management
+- `app/Repositories/EventRepository.php` ? repository layer for database access
+- `app/Models/Event.php` and `app/Models/Booking.php` ? domain models
+- `routes/api.php` ? API route definitions
+- `database/migrations/` ? schema definitions for events, bookings, and users
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Requirements
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- PHP 8.3 or later
+- Composer
+- SQLite support enabled in PHP
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Installation
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/ivanjayasooriya/ticket-booking-api.git
+cd ticket-booking-api
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+If you are setting up authentication for Passport requests, run:
 
-## Contributing
+```bash
+php artisan passport:install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Running the API
 
-## Code of Conduct
+Start the local development server:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan serve
+```
 
-## Security Vulnerabilities
+The API is available at:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```text
+http://localhost:8000/api
+```
+
+## Authentication
+
+Protected routes require a valid OAuth access token generated by Passport. Use the Passport token endpoint with your client credentials and account details to receive a token, then include that token in the request header for protected endpoints.
+
+## API Endpoints
+
+### Public routes
+
+- `GET /api/events` ? List all events
+- `GET /api/events/{id}` ? Get a single event by ID
+
+### Protected routes
+
+- `POST /api/events` ? Create a new event
+- `PUT /api/events/{id}` ? Update an event
+- `DELETE /api/events/{id}` ? Delete an event
+- `POST /api/events/{id}/book` ? Book tickets for an event
+- `GET /api/my-bookings` ? Get the authenticated user's bookings
+
+## Example Requests
+
+### Create an event
+
+```bash
+curl -X POST http://localhost:8000/api/events   -H "Content-Type: application/json"   -d '{
+    "title": "Summer Music Festival",
+    "description": "Live performances, food stalls, and evening entertainment.",
+    "location": "Colombo",
+    "date": "2026-12-15T18:00:00",
+    "total_tickets": 250,
+    "ticket_price": 35.50
+  }'
+```
+
+Include your Passport access token in the authenticated request header before calling protected routes.
+
+### Book tickets
+
+```bash
+curl -X POST http://localhost:8000/api/events/1/book   -H "Content-Type: application/json"   -d '{
+    "tickets_booked": 2
+  }'
+```
+
+### View current bookings
+
+```bash
+curl http://localhost:8000/api/my-bookings
+```
+
+## Notes
+
+- Booking requests validate the ticket count against the event's remaining inventory.
+- Successful booking creates a booking record with the user, ticket count, total amount, and confirmed status.
+- By default, the app uses SQLite for local development; update the database settings in `.env` if you want to switch to MySQL or PostgreSQL.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License.
