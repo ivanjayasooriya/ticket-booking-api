@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BookTicketRequest;
+use App\Http\Requests\StoreEventRequest;
+use App\Http\Requests\UpdateEventRequest;
 use App\Http\Resources\BookingResource;
 use App\Http\Resources\EventResource;
 use App\Services\EventServiceInterface;
@@ -35,7 +37,7 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEventRequest $request)
     {
         $event = $this->eventService->createEvent($request->validated(), $request->user()->id);
         return response()->json([
@@ -63,7 +65,7 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateEventRequest $request, string $id)
     {
         $event = $this->eventService->updateEvent($request->validated(), $id);
         if (!$event) {
