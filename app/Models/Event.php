@@ -11,7 +11,7 @@ class Event extends Model
 {
     use HasFactory;
     
-    protected $fillable = [
+    protected $fillable = [ // allow mass assignment
         'user_id',
         'title',
         'description',
@@ -21,19 +21,19 @@ class Event extends Model
         'ticket_price',
     ];
 
-    protected $casts = [
+    protected $casts = [ // define data types
         'user_id' => 'integer',
         'date' => 'datetime',
         'total_tickets' => 'integer',
         'ticket_price' => 'float',
     ];
 
-    public function organizer(): BelongsTo
+    public function organizer(): BelongsTo // user who created the event
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function bookings(): HasMany
+    public function bookings(): HasMany // bookings for the event
     {
         return $this->hasMany(Booking::class);
     }
